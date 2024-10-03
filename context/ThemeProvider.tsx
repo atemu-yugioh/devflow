@@ -10,24 +10,22 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState("");
-
-  const handleThemeChange = () => {
-    if (mode === "dark") {
-      setMode("light");
-      document.documentElement.classList.add("light");
-    } else {
-      setMode("dark");
-      document.documentElement.classList.add("dark");
-    }
-  };
+  const [mode, setMode] = useState("light");
 
   useEffect(() => {
-    handleThemeChange();
-  }, [mode]);
+    const savedMode = localStorage.getItem("theme") || "light";
+    setMode(savedMode);
+    document.documentElement.classList.toggle("dark", savedMode === "dark");
+  }, []);
+
+  const changeTheme = (mode: string) => {
+    setMode(mode);
+    localStorage.setItem("theme", mode);
+    document.documentElement.classList.toggle("dark", mode === "dark");
+  };
 
   return (
-    <ThemeContext.Provider value={{ mode, setMode }}>
+    <ThemeContext.Provider value={{ mode, setMode: changeTheme }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -35,10 +33,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 export function useTheme() {
   const context = useContext(ThemeContext);
-
   if (context === undefined) {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
-
   return context;
 }
