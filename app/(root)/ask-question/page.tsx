@@ -1,10 +1,14 @@
+import Question from "@/components/forms/Question";
 import React from "react";
 
 const page = () => {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center">
-      Ask Question
-    </main>
+    <div>
+      <h1 className="h1-bold text-dark100_light900">Ask a question</h1>
+      <div className="mt-9">
+        <Question />
+      </div>
+    </div>
   );
 };
 
