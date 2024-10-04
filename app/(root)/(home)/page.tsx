@@ -1,4 +1,7 @@
+import Filter from "@/components/shared/Filter";
+import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { Button } from "@/components/ui/button";
+import { HomePageFilters } from "@/constants/filter";
 import Link from "next/link";
 
 export default function Home() {
@@ -13,8 +16,18 @@ export default function Home() {
         </Link>
       </div>
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-        LocalSearchbar
-        <p>Filter</p>
+        <LocalSearchbar
+          route=""
+          placeholder="Search for questions"
+          otherClasses="flex-1"
+          iconPosition="left"
+          imgSrc="/assets/icons/search.svg"
+        />
+        <Filter
+          filters={HomePageFilters}
+          otherClasses="min-h-[56px] sm:min-w-[170px]"
+          containerClasses="hidden max-md:flex"
+        />
       </div>
       HomeFilters
       <div className="mt-10 flex w-full flex-col gap-6">no result</div>
