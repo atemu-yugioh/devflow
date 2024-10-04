@@ -1,3 +1,4 @@
+import HomeFilter from "@/components/home/HomeFilter";
 import Filter from "@/components/shared/Filter";
 import LocalSearchbar from "@/components/shared/search/LocalSearchbar";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,8 @@ export default function Home() {
           containerClasses="hidden max-md:flex"
         />
       </div>
-      HomeFilters
+
+      <HomeFilter />
       <div className="mt-10 flex w-full flex-col gap-6">no result</div>
     </>
   );
