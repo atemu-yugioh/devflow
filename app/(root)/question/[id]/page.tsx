@@ -1,9 +1,12 @@
 import Answer from "@/components/forms/Answer";
+import AllAnswers from "@/components/shared/AllAnswers";
 import Metric from "@/components/shared/Metric";
 import ParseHTML from "@/components/shared/ParseHTML";
 import RenderTag from "@/components/shared/RenderTag";
 import { getQuestionById } from "@/lib/actions/question.action";
+import { getUserById } from "@/lib/actions/user.action";
 import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
+import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -14,6 +17,13 @@ type PropsTemp = {
 };
 
 const Page = async ({ params, searchParams }: PropsTemp) => {
+  const { userId: clerkId } = auth();
+
+  let mongoUser;
+  if (clerkId) {
+    mongoUser = await getUserById({ userId: clerkId });
+  }
+
   const result = await getQuestionById({ questionId: params.id });
 
   return (
@@ -41,7 +51,6 @@ const Page = async ({ params, searchParams }: PropsTemp) => {
           {result.title}
         </h2>
       </div>
-
       <div className="mb-8 mt-5 flex flex-wrap gap-4">
         <Metric
           imgUrl="/assets/icons/clock.svg"
@@ -65,9 +74,7 @@ const Page = async ({ params, searchParams }: PropsTemp) => {
           textStyles="small-medium text-dark400_light800"
         />
       </div>
-
       <ParseHTML data={result.content} />
-
       <div className="mt-8 flex flex-wrap gap-2">
         {result.tags.map((tag: any) => (
           <RenderTag
@@ -79,7 +86,17 @@ const Page = async ({ params, searchParams }: PropsTemp) => {
         ))}
       </div>
 
-      <Answer />
+      <AllAnswers
+        questionId={result._id}
+        userId={JSON.stringify(mongoUser._id)}
+        totalAnswers={result.answers.length}
+      />
+
+      <Answer
+        question={result.content}
+        questionId={JSON.stringify(result._id)}
+        authorId={JSON.stringify(mongoUser._id)}
+      />
     </>
   );
 };
