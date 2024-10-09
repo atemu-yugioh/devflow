@@ -39,6 +39,7 @@ const Page = async () => {
             <QuestionCard
               key={question._id}
               _id={question._id}
+              clerkId={userId}
               title={question.title}
               tags={question.tags}
               author={question.author}
