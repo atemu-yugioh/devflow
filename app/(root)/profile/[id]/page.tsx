@@ -1,3 +1,5 @@
+import React from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileLink from "@/components/shared/ProfileLink";
 import Stats from "@/components/shared/Stats";
 import { Button } from "@/components/ui/button";
@@ -8,7 +10,8 @@ import { SignedIn } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import QuestionTab from "@/components/shared/QuestionTab";
+import AnswersTab from "@/components/shared/AnswersTab";
 
 const Page = async ({ params, searchParams }: URLProps) => {
   const { userId: clerkId } = auth();
@@ -84,8 +87,30 @@ const Page = async ({ params, searchParams }: URLProps) => {
       />
 
       <div className="mt-10 flex gap-10">
-        <p>Top Question</p>
-        <p>Top Answer</p>
+        <Tabs defaultValue="top-posts" className="flex-1">
+          <TabsList className="background-light800_dark400 min-h-[42px] p-1">
+            <TabsTrigger value="top-posts" className="tab">
+              Top Posts
+            </TabsTrigger>
+            <TabsTrigger value="answers" className="tab">
+              Top Answers
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="top-posts" className="flex w-full flex-col gap-6">
+            <QuestionTab
+              searchParams={searchParams}
+              userId={userInfo.user._id}
+              clerkId={clerkId}
+            />
+          </TabsContent>
+          <TabsContent value="answers" className="flex w-full flex-col gap-6">
+            <AnswersTab
+              searchParams={searchParams}
+              userId={userInfo.user._id}
+              clerkId={clerkId}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </>
   );

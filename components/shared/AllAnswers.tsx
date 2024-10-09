@@ -3,7 +3,7 @@ import Filter from "./Filter";
 import { getAnswers } from "@/lib/actions/answer.action";
 import Link from "next/link";
 import Image from "next/image";
-import { convertToObjectMongodbId, getTimestamp } from "@/lib/utils";
+import { getTimestamp } from "@/lib/utils";
 import ParseHTML from "./ParseHTML";
 import { AnswerFilters } from "@/constants/filter";
 import Votes from "./Votes";
