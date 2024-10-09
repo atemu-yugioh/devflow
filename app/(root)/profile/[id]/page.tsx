@@ -1,4 +1,5 @@
 import ProfileLink from "@/components/shared/ProfileLink";
+import Stats from "@/components/shared/Stats";
 import { Button } from "@/components/ui/button";
 import { getInfoUser } from "@/lib/actions/user.action";
 import { getJoinedDate } from "@/lib/utils";
@@ -77,7 +78,10 @@ const Page = async ({ params, searchParams }: URLProps) => {
         </div>
       </div>
 
-      <div>Stats</div>
+      <Stats
+        totalQuestions={userInfo.totalQuestions}
+        totalAnswers={userInfo.totalAnswers}
+      />
 
       <div className="mt-10 flex gap-10">
         <p>Top Question</p>
