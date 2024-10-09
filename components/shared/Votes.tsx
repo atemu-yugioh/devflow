@@ -4,6 +4,13 @@ import React from "react";
 import { formatAndDivideNumber } from "@/lib/utils";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import {
+  downVoteQuestion,
+  upVoteQuestion,
+} from "@/lib/actions/question.action";
+import { downVoteAnswer, upVoteAnswer } from "@/lib/actions/answer.action";
+import { toggleSaveQuestion } from "@/lib/actions/user.action";
+import path from "path";
 
 interface Props {
   type: string;
@@ -28,12 +35,57 @@ const Votes = ({
 }: Props) => {
   const pathname = usePathname();
 
-  const handleSave = () => {
-    console.log("implement save question");
+  const handleSave = async () => {
+    await toggleSaveQuestion({
+      userId: JSON.parse(userId),
+      questionId: JSON.parse(itemId),
+      path: pathname,
+    });
   };
 
-  const handleVote = (action: string) => {
-    console.log("implements vote");
+  const handleVote = async (action: string) => {
+    if (action === "upvote") {
+      if (type === "Question") {
+        await upVoteQuestion({
+          questionId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpVoted,
+          hasDownVoted,
+          path: pathname,
+        });
+      } else if (type === "Answer") {
+        await upVoteAnswer({
+          answerId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpVoted,
+          hasDownVoted,
+          path: pathname,
+        });
+      }
+      // todo: show a toast
+      return;
+    }
+
+    if (action === "downvote") {
+      if (type === "Question") {
+        await downVoteQuestion({
+          questionId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpVoted,
+          hasDownVoted,
+          path: pathname,
+        });
+      } else if (type === "Answer") {
+        await downVoteAnswer({
+          answerId: JSON.parse(itemId),
+          userId: JSON.parse(userId),
+          hasUpVoted,
+          hasDownVoted,
+          path: pathname,
+        });
+      }
+      // todo: show a toast
+    }
   };
 
   return (
@@ -64,7 +116,7 @@ const Votes = ({
           <Image
             src={
               hasDownVoted
-                ? "/public/assets/icons/downvoted.svg"
+                ? "/assets/icons/downvoted.svg"
                 : "/assets/icons/downvote.svg"
             }
             width={18}
