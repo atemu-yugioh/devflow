@@ -3,9 +3,10 @@ import Filter from "./Filter";
 import { getAnswers } from "@/lib/actions/answer.action";
 import Link from "next/link";
 import Image from "next/image";
-import { getTimestamp } from "@/lib/utils";
+import { convertToObjectMongodbId, getTimestamp } from "@/lib/utils";
 import ParseHTML from "./ParseHTML";
 import { AnswerFilters } from "@/constants/filter";
+import Votes from "./Votes";
 
 interface Props {
   questionId: string;
@@ -25,7 +26,6 @@ const AllAnswers = async ({
   const result = await getAnswers({
     questionId,
   });
-
   return (
     <div className="mt-11">
       <div className="flex items-center justify-between">
@@ -57,7 +57,21 @@ const AllAnswers = async ({
                     </p>
                   </div>
                 </Link>
-                <div className="flex justify-end">VOTING</div>
+                <div className="flex justify-end">
+                  <Votes
+                    type="Answer"
+                    itemId={JSON.stringify(answer._id)}
+                    userId={userId}
+                    upVotes={answer.upvotes.length}
+                    hasUpVoted={answer.upvotes.includes(
+                      convertToObjectMongodbId(JSON.parse(userId))
+                    )}
+                    downVotes={answer.downvotes.length}
+                    hasDownVoted={answer.downvotes.includes(
+                      convertToObjectMongodbId(JSON.parse(userId))
+                    )}
+                  />
+                </div>
               </div>
             </div>
             <ParseHTML data={answer.content} />

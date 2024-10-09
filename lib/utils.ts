@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
+import { Types } from "mongoose";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -50,3 +51,5 @@ export const formatAndDivideNumber = (num: number): string => {
     return num.toString();
   }
 };
+
+export const convertToObjectMongodbId = (id: string) => new Types.ObjectId(id);
