@@ -18,17 +18,41 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import { Badge } from "../ui/badge";
 import { createQuestion, editQuestion } from "@/lib/actions/question.action";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeProvider";
-import { type } from "os";
+import { Badge } from "../ui/badge";
 
 interface Props {
   type?: string;
   mongoUserId: string;
   questionDetails?: string;
 }
+
+const value = (type?: string, questionDetails?: string) => {
+  if (type !== "Edit") {
+    return {
+      questionDetail: null,
+      valueForm: {
+        title: "",
+        explanation: "",
+        tags: [],
+      },
+    };
+  }
+
+  const parsedQuestionDetails = JSON.parse(questionDetails || "");
+  const groupedTags = parsedQuestionDetails.tags.map((tag: any) => tag.name);
+
+  return {
+    questionDetail: parsedQuestionDetails,
+    valueForm: {
+      title: parsedQuestionDetails.title || "",
+      explanation: parsedQuestionDetails.content || "",
+      tags: groupedTags || [],
+    },
+  };
+};
 
 const Question = ({ type, mongoUserId, questionDetails }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -37,17 +61,15 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const parsedQuestionDetails = JSON.parse(questionDetails || "");
-  const groupedTags = parsedQuestionDetails.tags.map((tag: any) => tag.name);
+  // const parsedQuestionDetails = JSON.parse(questionDetails || "");
+  // const groupedTags = parsedQuestionDetails.tags.map((tag: any) => tag.name);
+
+  const { valueForm, questionDetail } = { ...value(type, questionDetails) };
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof QuestionsSchema>>({
     resolver: zodResolver(QuestionsSchema),
-    defaultValues: {
-      title: parsedQuestionDetails.title || "",
-      explanation: parsedQuestionDetails.content || "",
-      tags: groupedTags || [],
-    },
+    defaultValues: { ...valueForm },
   });
 
   // 2. Define a submit handler.
@@ -57,7 +79,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
     try {
       if (type === "Edit") {
         await editQuestion({
-          questionId: parsedQuestionDetails._id,
+          questionId: questionDetail._id,
           title: values.title,
           content: values.explanation,
           path: pathname,
@@ -165,7 +187,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
                   }}
                   onBlur={field.onBlur}
                   onEditorChange={(content) => field.onChange(content)}
-                  initialValue={parsedQuestionDetails.content || ""}
+                  initialValue={valueForm.explanation || ""}
                   init={{
                     height: 350,
                     menubar: false,
