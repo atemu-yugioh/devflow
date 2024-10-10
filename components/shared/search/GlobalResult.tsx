@@ -2,19 +2,43 @@
 
 import { useSearchParams } from "next/navigation";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import GlobalFilters from "./GlobalFilters";
+import { globalSearch } from "@/lib/actions/general.action";
 
 const GlobalResult = () => {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
+
   const [result, setResult] = useState([
     { type: "question", id: 1, title: "Next.js question" },
     { type: "tag", id: 1, title: "Nextjs" },
     { type: "user", id: 1, title: "jsm" },
   ]);
+
+  const global = searchParams.get("global");
+  const type = searchParams.get("type");
+
+  useEffect(() => {
+    const fetchResult = async () => {
+      setResult([]);
+      setIsLoading(true);
+      try {
+        const res = await globalSearch({ query: global, type });
+        setResult(JSON.parse(res));
+      } catch (error) {
+        console.error(error);
+        throw error;
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (global) {
+      fetchResult();
+    }
+  }, [global, type]);
 
   const renderLink = (type: string, id: string) => {
     switch (type) {
