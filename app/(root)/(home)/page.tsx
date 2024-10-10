@@ -22,7 +22,7 @@ export default async function Home() {
       </div>
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearchbar
-          route=""
+          route="/"
           placeholder="Search for questions"
           otherClasses="flex-1"
           iconPosition="left"
