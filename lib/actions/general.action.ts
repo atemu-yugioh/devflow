@@ -74,7 +74,6 @@ export const globalSearch = async (params: SearchParams) => {
               : item._id,
       }));
     }
-    console.log(results);
     return JSON.stringify(results);
   } catch (error) {
     console.log(`Error fetching global results, ${error}`);

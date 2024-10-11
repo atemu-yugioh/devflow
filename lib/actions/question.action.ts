@@ -21,7 +21,7 @@ export async function getQuestions(params: GetQuestionsParams) {
     connectToDatabase();
 
     const { searchQuery, filter, page = 1, pageSize = 2 } = params;
-    // Calculcate the number of posts to skip based on the page number and page size
+    // Calculate the number of posts to skip based on the page number and page size
     const skipAmount = (page - 1) * pageSize;
     const query: FilterQuery<typeof Question> = {};
 
@@ -117,8 +117,15 @@ export async function createQuestion(params: CreateQuestionParams) {
     });
 
     // Create an interaction record for the user's ask_question action
+    await Interaction.create({
+      user: author,
+      action: "ask_question",
+      question: question._id,
+      tags: tagDocuments,
+    });
 
     // Increment author's reputation by +5 for creating a question
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
 
     revalidatePath(path);
   } catch (error) {
@@ -153,6 +160,16 @@ export async function upVoteQuestion(params: QuestionVoteParams) {
     }
 
     // Increment author's reputation
+    // Increment author's reputation by +1/-1 for upvoting/revoking an upvote to the question
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasUpVoted ? -1 : 1 },
+    });
+
+    // Increment author's reputation by +10/-10 for recieving an upvote/downvote to the question
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasUpVoted ? -10 : 10 },
+    });
+
     revalidatePath(path);
   } catch (error) {
     console.log(error);
@@ -187,6 +204,13 @@ export async function downVoteQuestion(params: QuestionVoteParams) {
     }
 
     // Increment author's reputation
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasDownVoted ? -2 : 2 },
+    });
+
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasDownVoted ? -10 : 10 },
+    });
     revalidatePath(path);
   } catch (error) {
     console.log(error);
