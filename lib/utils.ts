@@ -2,6 +2,8 @@ import { clsx, type ClassValue } from "clsx";
 import { Types } from "mongoose";
 import { twMerge } from "tailwind-merge";
 import qs from "query-string";
+import { BadgeCounts, BadgeCriteriaType } from "@/types";
+import { BADGE_CRITERIA } from "@/constants";
 
 interface UrlQueryParams {
   params: string;
@@ -106,4 +108,32 @@ export const removeKeysFromQuery = ({
     },
     { skipNull: true }
   );
+};
+
+interface BadgeParam {
+  criteria: {
+    type: BadgeCriteriaType;
+    count: number;
+  }[];
+}
+
+export const assignBadges = (params: BadgeParam) => {
+  const badgeCounts: BadgeCounts = {
+    GOLD: 0,
+    SILVER: 0,
+    BRONZE: 0,
+  };
+  const { criteria } = params;
+  criteria.forEach((item) => {
+    const { type, count } = item;
+
+    const badgeLevels: any = BADGE_CRITERIA[type];
+
+    Object.keys(badgeLevels).forEach((level: any) => {
+      if (count >= badgeLevels[level]) {
+        badgeCounts[level as keyof BadgeCounts] += 1;
+      }
+    });
+  });
+  return badgeCounts;
 };
