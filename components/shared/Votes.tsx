@@ -10,8 +10,8 @@ import {
 } from "@/lib/actions/question.action";
 import { downVoteAnswer, upVoteAnswer } from "@/lib/actions/answer.action";
 import { toggleSaveQuestion } from "@/lib/actions/user.action";
-import path from "path";
 import { viewQuestion } from "@/lib/actions/interaction.action";
+import { toast } from "@/hooks/use-toast";
 
 interface Props {
   type: string;
@@ -43,9 +43,20 @@ const Votes = ({
       questionId: JSON.parse(itemId),
       path: pathname,
     });
+
+    return toast({
+      title: `Question ${!hasSaved ? "Saved in" : "Removed from"} your collection`,
+      variant: !hasSaved ? "default" : "destructive",
+    });
   };
 
   const handleVote = async (action: string) => {
+    if (!userId) {
+      return toast({
+        title: "Please log in",
+        description: "You must be logged in to perform this action",
+      });
+    }
     if (action === "upvote") {
       if (type === "Question") {
         await upVoteQuestion({
@@ -55,6 +66,14 @@ const Votes = ({
           hasDownVoted,
           path: pathname,
         });
+
+        return toast({
+          title: `Upvote ${!hasUpVoted ? "Successful" : "Removed"}`,
+          variant: !hasUpVoted ? "default" : "destructive",
+          className: !hasUpVoted
+            ? "bg-green-500 text-white"
+            : "bg-red-500 text-white",
+        });
       } else if (type === "Answer") {
         await upVoteAnswer({
           answerId: JSON.parse(itemId),
@@ -62,6 +81,14 @@ const Votes = ({
           hasUpVoted,
           hasDownVoted,
           path: pathname,
+        });
+
+        return toast({
+          title: `Downvote ${!hasDownVoted ? "Successful" : "Removed"}`,
+          variant: !hasDownVoted ? "default" : "destructive",
+          className: !hasDownVoted
+            ? "bg-green-500 text-white"
+            : "bg-red-500 text-white",
         });
       }
       // todo: show a toast
